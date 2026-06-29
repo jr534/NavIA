@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bataille Navale - VS IA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e222b;
+            color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #4fc3f7;
+            margin-bottom: 10px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #00e676;
+            color: #1e222b;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #00b252;
+        }
+        .status-panel {
+            background-color: #2d3139;
+            padding: 15px;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 5px solid #4fc3f7;
+        }
+        .game-containers {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .grid-container {
+            text-align: center;
+        }
+        .grid-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #e0e0e0;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, 32px);
+            grid-template-rows: repeat(10, 32px);
+            gap: 2px;
+            background-color: #37474f;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        .cell {
+            background-color: #263238;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            user-select: none;
+            transition: background-color 0.15s;
+        }
+        /* États des cases */
+        .clickable {
+            cursor: pointer;
+        }
+        .clickable:hover {
+            background-color: #37474f;
+            border: 1px solid #4fc3f7;
+        }
+        .ship {
+            background-color: #4caf50; /* Vert pour vos navires intacts */
+        }
+        .hit {
+            background-color: #f44336; /* Rouge pour un tir réussi */
+            color: white;
+        }
+        .miss {
+            background-color: #90a4ae; /* Gris pour un tir manqué */
+            color: #1e222b;
+        }
+        .penalty {
+            background-color: #ff9800; /* Orange pour "Déjà tiré" */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bataille Navale contre l'IA</h1>
+    
+    <div class="controls">
+        <button id="btn-start" onclick="initNewGame()">Nouvelle Partie</button>
+    </div>
+
+    <div class="status-panel" id="status-message">
+        Cliquez sur "Nouvelle Partie" pour commencer à jouer.
+    </div>
+
+    <div class="game-containers">
+        <!-- Grille de l'IA (Cible du Joueur) -->
+        <div class="grid-container">
+            <div class="grid-title">Grille de l'IA (Tirez ici)</div>
+            <div class="grid" id="player-target-grid"></div>
+        </div>
+
+        <!-- Grille du Joueur (Cible de l'IA) -->
+        <div class="grid-container">
+            <div class="grid-title">Votre Grille (Défense)</div>
+            <div class="grid" id="player-defense-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentGameId = null;
+        let isGameOver = false;
+
+        // Génère des grilles vides à l'ouverture de la page
+        function buildEmptyGrids() {
+            const emptyData = Array(10).fill().map(() => Array(10).fill(0));
+            renderGrid("player-target-grid", emptyData, false);
+            renderGrid("player-defense-grid", emptyData, false);
+        }
+
+        async function initNewGame() {
+            try {
+                const response = await fetch('/game/start', { method: 'POST' });
+                const data = await response.json();
+                
+                currentGameId = data.game_id;
+                isGameOver = false;
+                
+                document.getElementById("status-message").innerHTML = "La partie commence ! C'est à votre tour de tirer.";
+                
+                // On affiche la grille de tir (interactive) et la grille de défense (avec nos navires générés)
+                renderGrid("player-target-grid", data.hiden_grille_joueur, true);
+                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille);
+            } catch (error) {
+                console.error(error);
+                document.getElementById("status-message").innerText = "Erreur de connexion avec le serveur.";
+            }
+        }
+
+        async function shoot(y, x) {
+            if (!currentGameId || isGameOver) return;
+
+            try {
+                const response = await fetch(`/game/${currentGameId}/shoot`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ y, x })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    alert(err.detail || "Erreur de requête.");
+                    return;
+                }
+
+                const data = await response.json();
+                isGameOver = data.game_over;
+
+                // Construction du message de statut
+                let msg = `Vous avez tiré en (${y+1}, ${x+1}) : <strong>${data.player_shot.result}</strong>.<br>`;
+                if (data.ai_shot) {
+                    msg += `L'IA a tiré en (${data.ai_shot.y+1}, ${data.ai_shot.x+1}) : <strong>${data.ai_shot.result}</strong>.`;
+                }
+
+                if (isGameOver) {
+                    msg += `<br><span style="font-size: 20px; color: #ffeb3b;">🎉 Partie terminée ! Vainqueur : ${data.winner}</span>`;
+                }
+
+                document.getElementById("status-message").innerHTML = msg;
+
+                // Mise à jour visuelle des grilles
+                renderGrid("player-target-grid", data.hiden_grille_joueur, !isGameOver);
+                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("status-message").innerText = "Erreur lors de la transmission du tir.";
+            }
+        }
+
+        function renderGrid(containerId, gridData, isInteractive, playerShips = null) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            for (let y = 0; y < 10; y++) {
+                for (let x = 0; x < 10; x++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    const val = gridData[y][x];
+
+                    if (playerShips) {
+                        // Rendu pour la grille du joueur (Défense)
+                        const hasShip = playerShips[y][x] === 1;
+                        if (val === 1) {
+                            cell.classList.add('hit');
+                            cell.innerText = '💥';
+                        } else if (val === -1) {
+                            cell.classList.add('miss');
+                            cell.innerText = '•';
+                        } else if (hasShip) {
+                            cell.classList.add('ship'); // Bateau intact
+                        }
+                    } else {
+                        // Rendu pour la grille de l'IA (Cible)
+                        if (val === 1) {
+                            cell.classList.add('hit');
+                            cell.innerText = '💥';
+                        } else if (val === -1) {
+                            cell.classList.add('miss');
+                            cell.innerText = '•';
+                        } else if (val === -5) {
+                            cell.classList.add('penalty');
+                            cell.innerText = '⚠️';
+                        } else if (isInteractive) {
+                            cell.classList.add('clickable');
+                            cell.addEventListener('click', () => shoot(y, x));
+                        }
+                    }
+                    container.appendChild(cell);
+                }
+            }
+        }
+
+        // Initialisation par défaut au chargement
+        buildEmptyGrids();
+    </script>
+</body>
+</html>
