@@ -1,5 +1,7 @@
 # NavIA
 
+> Statut : projet en cours de developpement.
+
 NavIA est un projet de formation autour des reseaux de neurones, avec une application concrete : apprendre a un modele MLP (Multi-Layer Perceptron) a proposer des tirs dans une partie de bataille navale.
 
 Le but du projet est pedagogique. Il sert a comprendre comment representer une grille de jeu, entrainer un reseau de neurones simple, exploiter ses predictions, puis relier ce modele a une interface jouable.
@@ -89,7 +91,6 @@ NavIA/
 ## Pistes d'amelioration
 
 - Corriger et uniformiser les noms de variables.
-- Ajouter un fichier `requirements.txt`.
 - Ajouter des tests unitaires sur la generation des grilles.
 - Ameliorer l'entrainement avec plus de parties et une strategie de score plus riche.
 - Afficher une heatmap des recommandations de l'IA dans l'interface.
