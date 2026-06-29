@@ -30,7 +30,7 @@ Pendant une partie, l'etat connu de la grille est transforme en vecteur de 100 v
 
 Dans ce projet, les fichiers [`backend.py`](backend.py) et [`index.html`](index.html) ont ete entierement codes avec l'aide d'une IA.
 
-Cette utilisation fait partie de l'objectif du projet : relier chaque partie du code a un resultat concret de recommandation plus personnalisee. Le backend transforme les predictions du MLP en decisions exploitables par le jeu, tandis que l'interface affiche le deroulement de la partie et permet d'observer l'effet des recommandations de l'IA.
+Cette utilisation s'inscrit en continuité avec l'objectif principal du projet, qui n'est pas de fournir une interface ou une API, mais de concevoir un réseau de neurones MLP et de s'entraîner à sa création. 
 
 ## Technologies utilisees
 
