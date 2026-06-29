@@ -1,4 +1,4 @@
-<img width="3548" height="1774" alt="image" src="https://github.com/user-attachments/assets/53c13084-9578-42b1-8ef5-21877424662e" /># NavIA
+# NavIA
 <img width="3548" height="1774" alt="image" src="https://github.com/user-attachments/assets/a95c5950-88fb-4928-a0d7-14b1729397f5" />
 
 > Statut : projet en cours de developpement.
