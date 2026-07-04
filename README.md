@@ -1,7 +1,6 @@
 # NavIA
 <img width="3548" height="1774" alt="image" src="https://github.com/user-attachments/assets/a95c5950-88fb-4928-a0d7-14b1729397f5" />
 
-> Statut : projet en cours de developpement.
 
 NavIA est un projet de formation autour des reseaux de neurones, avec une application concrete : apprendre a un modele MLP (Multi-Layer Perceptron) a proposer des tirs dans une partie de bataille navale.
 
