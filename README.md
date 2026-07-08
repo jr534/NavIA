@@ -90,7 +90,7 @@ NavIA/
 
 ## visualisation
 
-<img width="800" height="450" alt="ezgif-37262bbe015b300b" src="https://github.com/user-attachments/assets/591e09ec-2413-470b-bad2-4d6a2a211ba1" />
+<img width="800" height="450" alt="image" src="https://github.com/user-attachments/assets/f17e79f0-15a7-4651-b90c-6316132b6cda" />
 
 ## Licence
 
