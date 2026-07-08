@@ -88,12 +88,9 @@ NavIA/
 +-- README.md
 ```
 
-## Pistes d'amelioration
+## visualisation
 
-- Corriger et uniformiser les noms de variables.
-- Ajouter des tests unitaires sur la generation des grilles.
-- Ameliorer l'entrainement avec plus de parties et une strategie de score plus riche.
-- Afficher une heatmap des recommandations de l'IA dans l'interface.
+<img width="800" height="450" alt="ezgif-37262bbe015b300b" src="https://github.com/user-attachments/assets/591e09ec-2413-470b-bad2-4d6a2a211ba1" />
 
 ## Licence
 
