@@ -24,8 +24,11 @@ class FCN(nn.Module):
         return self.network(x)  # (batch, 1, 10, 10)
 
 
-def charger_modele(path="Navia_V2_FCN.pt"):
+def charger_modele(path="models/Navia_V2_FCN.pt"):
     """Essaie de charger le FCN. Renvoie None si indisponible (fallback aléatoire)."""
+    import os
+    if not os.path.exists(path) and os.path.exists("Navia_V2_FCN.pt"):
+        path = "Navia_V2_FCN.pt"
     try:
         model = FCN()
         model.load_state_dict(torch.load(path, weights_only=True))
@@ -35,7 +38,6 @@ def charger_modele(path="Navia_V2_FCN.pt"):
     except Exception as e:
         print(f"[!] Impossible de charger le modèle ({e}). L'IA joue en mode aléatoire.")
         return None
-print(charger_modele(path="Navia_V2_FCN.pt").shape())
 
 def construire_tenseur_entree(hit, miss, not_explored):
     """Construit le tenseur (1, 3, 10, 10) attendu par le FCN à partir

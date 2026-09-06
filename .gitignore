@@ -9,6 +9,7 @@ env/
 
 output.zip
 tempCodeRunnerFile.py
+*.mp4
 
 .DS_Store
 Thumbs.db

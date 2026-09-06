@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import train
 import random
+import os
 class FCN(nn.Module):
 
     def __init__(self):
@@ -148,6 +149,8 @@ for empoque in range(1000000):
     losss.append(moyenne_losss_epoque)
     if moyenne_losss_epoque < meilleure_loss:
         meilleure_loss = moyenne_losss_epoque
+        os.makedirs("models", exist_ok=True)
+        torch.save(models.state_dict(), "models/Navia_V2_FCN.pt")
         torch.save(models.state_dict(), "Navia_V2_FCN.pt")
         print(f"✓ Nouveau meilleur modèle sauvegardé ! Loss : {meilleure_loss:.6f}")
     moyenne_losss_global = sum(losss) / len(losss)

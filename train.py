@@ -121,7 +121,7 @@ class Grille:
                     type_bataux = "Torpilleur"
 
                 
-            print (f"Placement du {type_bataux} sur la self.grille ")
+            #print (f"Placement du {type_bataux} sur la self.grille ")
             self.placée_bataux(len_bataux)
                         
             #self.print_grille(self.grille)

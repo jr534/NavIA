@@ -1,131 +1,252 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bataille Navale - VS IA</title>
+    <title>Navia - AI Battleship (FCN & MLP)</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1e222b;
-            color: #f5f5f5;
+            background-color: #D7DCF4;
+            color: #1e222b;
             margin: 0;
             padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
         h1 {
-            color: #4fc3f7;
-            margin-bottom: 10px;
+            color: #3F56BD;
+            margin-top: 20px;
+            margin-bottom: 5px;
+            text-align: center;
+            font-weight: 800;
+            font-size: 28px;
+            letter-spacing: 0.5px;
+        }
+        .subtitle {
+            color: #5a6478;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 15px;
+            max-width: 650px;
+            line-height: 1.4;
         }
         .controls {
-            margin-bottom: 20px;
-        }
-        button {
-            background-color: #00e676;
-            color: #1e222b;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover {
-            background-color: #00b252;
-        }
-        .status-panel {
-            background-color: #2d3139;
-            padding: 15px;
-            border-radius: 5px;
-            width: 100%;
-            max-width: 700px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-left: 5px solid #4fc3f7;
-        }
-        .game-containers {
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .grid-container {
-            text-align: center;
-        }
-        .grid-title {
-            font-size: 18px;
-            margin-bottom: 10px;
-            color: #e0e0e0;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(10, 32px);
-            grid-template-rows: repeat(10, 32px);
-            gap: 2px;
-            background-color: #37474f;
-            padding: 5px;
-            border-radius: 5px;
-        }
-        .cell {
-            background-color: #263238;
-            border-radius: 3px;
+            margin-bottom: 25px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            user-select: none;
-            transition: background-color 0.15s;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        /* États des cases */
+        label {
+            font-weight: bold;
+            color: #1e222b;
+            font-size: 15px;
+        }
+        select {
+            padding: 12px 20px;
+            font-size: 15px;
+            border-radius: 8px;
+            border: 2px solid #3F56BD;
+            background-color: #f0f3ff;
+            color: #3F56BD;
+            font-weight: bold;
+            outline: none;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(63, 86, 189, 0.1);
+            transition: all 0.2s ease-in-out;
+        }
+        select:hover {
+            background-color: #e9ecf8;
+            box-shadow: 0 6px 12px rgba(63, 86, 189, 0.15);
+        }
+        button {
+            background-color: #3F56BD;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(63, 86, 189, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+        button:hover {
+            background-color: #2b3e94;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(63, 86, 189, 0.3);
+        }
+        button:active {
+            transform: translateY(0);
+        }
+        .status-panel {
+            background-color: #f0f3ff;
+            color: #1e222b;
+            padding: 18px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 820px;
+            margin-bottom: 30px;
+            text-align: center;
+            border-left: 6px solid #3F56BD;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            font-size: 15px;
+            line-height: 1.5;
+            box-sizing: border-box;
+        }
+        .game-containers {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 900px;
+        }
+        .grid-card {
+            background-color: #f0f3ff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e1e5f5;
+            flex: 1;
+            min-width: 290px;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .grid-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #1e222b;
+        }
+        .grid-subtitle {
+            font-size: 13px;
+            color: #5a6478;
+            margin-bottom: 16px;
+            text-align: center;
+            min-height: 18px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(10, min(36px, 8vw));
+            grid-template-rows: repeat(10, min(36px, 8vw));
+            gap: 3px;
+            background-color: #b0b7da;
+            padding: 4px;
+            border-radius: 8px;
+        }
+        .cell {
+            background-color: #e9ecf8;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: min(15px, 3.5vw);
+            font-weight: bold;
+            user-select: none;
+            transition: all 0.15s ease-in-out;
+            aspect-ratio: 1;
+        }
         .clickable {
             cursor: pointer;
         }
         .clickable:hover {
-            background-color: #37474f;
-            border: 1px solid #4fc3f7;
+            background-color: #cbd2ee;
+            transform: scale(1.05);
+            box-shadow: 0 0 8px rgba(63, 86, 189, 0.2);
+            border: 1px solid #3F56BD;
         }
         .ship {
-            background-color: #4caf50; /* Vert pour vos navires intacts */
-        }
-        .hit {
-            background-color: #f44336; /* Rouge pour un tir réussi */
+            background-color: #3F56BD;
             color: white;
         }
+        .hit {
+            background-color: #1e222b;
+            color: #ff5252;
+            font-size: min(18px, 4.5vw);
+        }
         .miss {
-            background-color: #90a4ae; /* Gris pour un tir manqué */
-            color: #1e222b;
+            background-color: #e9ecf8;
+            color: #3F56BD;
+            font-size: min(20px, 5vw);
         }
         .penalty {
-            background-color: #ff9800; /* Orange pour "Déjà tiré" */
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        /* Legend */
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            font-size: 12px;
+            color: #5a6478;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
 
-    <h1>Bataille Navale contre l'IA</h1>
+    <h1>NAVIA - AI BATTLESHIP</h1>
+    <div class="subtitle">
+        Compare and test our two AI architectures: the new **Navia V2 (FCN)** and the classic **Navia V1 (MLP)**. Watch the model's predictive heatmap evolve in real-time as the AI scans your fleet.
+    </div>
     
     <div class="controls">
-        <button id="btn-start" onclick="initNewGame()">Nouvelle Partie</button>
+        <label for="select-model">AI Model:</label>
+        <select id="select-model">
+            <option value="fcn" selected>Navia V2 (Convolutional FCN)</option>
+            <option value="mlp">Navia V1 (Dense MLP)</option>
+        </select>
+        <button id="btn-start" onclick="initNewGame()">New Game</button>
     </div>
 
     <div class="status-panel" id="status-message">
-        Cliquez sur "Nouvelle Partie" pour commencer à jouer.
+        Select an AI model and click "New Game" to start.
     </div>
 
     <div class="game-containers">
-        <!-- Grille de l'IA (Cible du Joueur) -->
-        <div class="grid-container">
-            <div class="grid-title">Grille de l'IA (Tirez ici)</div>
+        <!-- AI Grid (Player Target) -->
+        <div class="grid-card">
+            <div class="grid-title">AI's Board</div>
+            <div class="grid-subtitle">Click cells to launch attacks</div>
             <div class="grid" id="player-target-grid"></div>
+            <div class="legend">
+                <div class="legend-item"><span class="legend-color" style="background-color: #e9ecf8; border: 1px solid #cbd2ee;"></span> Water</div>
+                <div class="legend-item">❌ Hit</div>
+                <div class="legend-item">• Miss</div>
+            </div>
         </div>
 
-        <!-- Grille du Joueur (Cible de l'IA) -->
-        <div class="grid-container">
-            <div class="grid-title">Votre Grille (Défense)</div>
+        <!-- Player Grid (Defense + Heatmap) -->
+        <div class="grid-card">
+            <div class="grid-title">Your Board (Defense)</div>
+            <div class="grid-subtitle" id="model-subtitle">AI Heatmap (No active model)</div>
             <div class="grid" id="player-defense-grid"></div>
+            <div class="legend">
+                <div class="legend-item"><span class="legend-color" style="background-color: #3F56BD;"></span> Your Ship</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: hsl(229, 95%, 40%);"></span> Max Priority</div>
+                <div class="legend-item"><span class="legend-color" style="background-color: hsl(229, 20%, 93%);"></span> Min Priority</div>
+            </div>
         </div>
     </div>
 
@@ -133,7 +254,13 @@
         let currentGameId = null;
         let isGameOver = false;
 
-        // Génère des grilles vides à l'ouverture de la page
+        function getCoordStr(y, x) {
+            const letter = String.fromCharCode(65 + x); // A-J
+            const num = y + 1; // 1-10
+            return `${letter}${num}`;
+        }
+
+        // Generates empty boards on load
         function buildEmptyGrids() {
             const emptyData = Array(10).fill().map(() => Array(10).fill(0));
             renderGrid("player-target-grid", emptyData, false);
@@ -141,21 +268,23 @@
         }
 
         async function initNewGame() {
+            const modelType = document.getElementById("select-model").value;
             try {
-                const response = await fetch('/game/start', { method: 'POST' });
+                const response = await fetch(`/game/start?model_type=${modelType}`, { method: 'POST' });
                 const data = await response.json();
                 
                 currentGameId = data.game_id;
                 isGameOver = false;
                 
-                document.getElementById("status-message").innerHTML = "La partie commence ! C'est à votre tour de tirer.";
+                const modelLabel = data.model_type === "fcn" ? "Navia V2 (FCN)" : "Navia V1 (MLP)";
+                document.getElementById("status-message").innerHTML = `Game started against <strong>${modelLabel}</strong>. <strong>It's your turn to shoot.</strong>`;
+                document.getElementById("model-subtitle").innerText = `${modelLabel} Heatmap`;
                 
-                // On affiche la grille de tir (interactive) et la grille de défense (avec nos navires générés)
                 renderGrid("player-target-grid", data.hiden_grille_joueur, true);
-                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille);
+                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille, data.ia_heatmap);
             } catch (error) {
                 console.error(error);
-                document.getElementById("status-message").innerText = "Erreur de connexion avec le serveur.";
+                document.getElementById("status-message").innerText = "Connection error with the server.";
             }
         }
 
@@ -171,38 +300,50 @@
 
                 if (!response.ok) {
                     const err = await response.json();
-                    alert(err.detail || "Erreur de requête.");
+                    alert(err.detail || "Request error.");
                     return;
                 }
 
                 const data = await response.json();
                 isGameOver = data.game_over;
 
-                // Construction du message de statut
-                let msg = `Vous avez tiré en (${y+1}, ${x+1}) : <strong>${data.player_shot.result}</strong>.<br>`;
+                const playerOutcome = data.player_shot.result.toUpperCase();
+                let msg = `You shot at <strong>${getCoordStr(y, x)}</strong>: <strong>${playerOutcome}</strong>.<br>`;
+                
                 if (data.ai_shot) {
-                    msg += `L'IA a tiré en (${data.ai_shot.y+1}, ${data.ai_shot.x+1}) : <strong>${data.ai_shot.result}</strong>.`;
+                    const aiOutcome = data.ai_shot.result.toUpperCase();
+                    const aiCoord = getCoordStr(data.ai_shot.y, data.ai_shot.x);
+                    const aiModel = data.model_type.toUpperCase();
+                    msg += `AI (${aiModel}) shot at <strong>${aiCoord}</strong>: <strong>${aiOutcome}</strong>.`;
                 }
 
                 if (isGameOver) {
-                    msg += `<br><span style="font-size: 20px; color: #ffeb3b;">🎉 Partie terminée ! Vainqueur : ${data.winner}</span>`;
+                    const winnerLabel = data.winner === "Joueur" ? "Player" : data.winner;
+                    msg += `<br><span style="font-size: 18px; color: #3F56BD; font-weight: bold;">🎉 Game Over! Winner: ${winnerLabel}</span>`;
                 }
 
                 document.getElementById("status-message").innerHTML = msg;
 
-                // Mise à jour visuelle des grilles
                 renderGrid("player-target-grid", data.hiden_grille_joueur, !isGameOver);
-                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille);
+                renderGrid("player-defense-grid", data.hiden_grille_ia, false, data.plataux_ia_grille, data.ia_heatmap);
 
             } catch (error) {
                 console.error(error);
-                document.getElementById("status-message").innerText = "Erreur lors de la transmission du tir.";
+                document.getElementById("status-message").innerText = "Error sending shoot command.";
             }
         }
 
-        function renderGrid(containerId, gridData, isInteractive, playerShips = null) {
+        function renderGrid(containerId, gridData, isInteractive, playerShips = null, heatmap = null) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
+
+            let minP = 0, maxP = 1, diffP = 1;
+            if (heatmap) {
+                const flatHeatmap = heatmap.flat();
+                minP = Math.min(...flatHeatmap);
+                maxP = Math.max(...flatHeatmap);
+                diffP = (maxP - minP) > 1e-6 ? (maxP - minP) : 1;
+            }
 
             for (let y = 0; y < 10; y++) {
                 for (let x = 0; x < 10; x++) {
@@ -210,29 +351,41 @@
                     cell.classList.add('cell');
                     const val = gridData[y][x];
 
+                    if (heatmap && val === 0) {
+                        const rawProb = heatmap[y][x];
+                        const normProb = (rawProb - minP) / diffP;
+                        
+                        const h = 229;
+                        const s = Math.round(20 + 75 * normProb);
+                        const l = Math.round(93 - 53 * normProb);
+                        
+                        cell.style.backgroundColor = `hsl(${h}, ${s}%, ${l}%)`;
+                    }
+
                     if (playerShips) {
-                        // Rendu pour la grille du joueur (Défense)
                         const hasShip = playerShips[y][x] === 1;
                         if (val === 1) {
                             cell.classList.add('hit');
-                            cell.innerText = '💥';
+                            cell.innerHTML = '❌';
                         } else if (val === -1) {
                             cell.classList.add('miss');
-                            cell.innerText = '•';
+                            cell.innerHTML = '•';
                         } else if (hasShip) {
-                            cell.classList.add('ship'); // Bateau intact
+                            cell.classList.add('ship');
+                            if (heatmap) {
+                                cell.style.border = '2px solid #3F56BD';
+                            }
                         }
                     } else {
-                        // Rendu pour la grille de l'IA (Cible)
                         if (val === 1) {
                             cell.classList.add('hit');
-                            cell.innerText = '💥';
+                            cell.innerHTML = '❌';
                         } else if (val === -1) {
                             cell.classList.add('miss');
-                            cell.innerText = '•';
+                            cell.innerHTML = '•';
                         } else if (val === -5) {
                             cell.classList.add('penalty');
-                            cell.innerText = '⚠️';
+                            cell.innerHTML = '⚠️';
                         } else if (isInteractive) {
                             cell.classList.add('clickable');
                             cell.addEventListener('click', () => shoot(y, x));
@@ -243,7 +396,6 @@
             }
         }
 
-        // Initialisation par défaut au chargement
         buildEmptyGrids();
     </script>
 </body>
